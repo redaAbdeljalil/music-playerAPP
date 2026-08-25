@@ -14,11 +14,6 @@ struct RootView: View {
         ZStack {
             AURAColor.ink.ignoresSafeArea()
 
-            // All four tabs stay alive at all times (opacity-toggled rather
-            // than switched in/out of the tree) so each keeps its own
-            // scroll position and navigation state across tab switches —
-            // a plain `switch` here would reset every tab's @StateObject
-            // every time the user left and came back to it.
             ZStack {
                 HomeView()
                     .opacity(selectedTab == .home ? 1 : 0)

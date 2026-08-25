@@ -37,11 +37,6 @@ struct DiscoverView: View {
             }
             .background(AURAColor.ink.ignoresSafeArea())
             .navigationDestination(for: Mood.self) { mood in
-                // NavigationStack destinations inherit environment objects
-                // automatically from the presenting hierarchy (unlike
-                // .sheet(), this isn't a separate presentation context),
-                // so MoodDetailView's own @EnvironmentObject picks up
-                // PlaybackManager from RootView without any extra wiring.
                 MoodDetailView(mood: mood, tracks: viewModel.tracks(for: mood))
             }
             .toolbar(.hidden, for: .navigationBar)

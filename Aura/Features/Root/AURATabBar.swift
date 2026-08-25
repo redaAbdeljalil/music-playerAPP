@@ -1,10 +1,5 @@
 import SwiftUI
 
-/// A deliberately original navigation treatment: icon-only tabs with a
-/// thin sliding underline indicator (via `matchedGeometryEffect`) rather
-/// than Apple's icon+label-always-visible tab bar. Flat ink background
-/// with a single hairline divider — no blur/material, to keep the
-/// editorial, non-glassy look the design system commits to.
 struct AURATabBar: View {
     @Binding var selectedTab: AURATab
     @Namespace private var indicatorNamespace
