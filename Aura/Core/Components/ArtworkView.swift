@@ -1,19 +1,11 @@
 import SwiftUI
 
-/// AURA never ships real (or copyrighted) album art. Instead, every
-/// track/album/mood/playlist gets a procedurally generated "aura" —
-/// two soft color fields derived deterministically from a seed string,
-/// so the same item always looks the same, but no two items look alike.
-/// This is the app's actual visual identity: artwork *is* the design
-/// language, not a placeholder for one. Swapping in real artwork later
-/// is a matter of adding an `AsyncImage`-backed variant behind the same
-/// `seed`-keyed API.
 struct ArtworkView: View {
     let seed: String
     var cornerRadius: CGFloat = AURARadius.md
 
     private var hashValue: Int {
-        // Simple djb2 string hash — deterministic, no dependencies.
+        // djb2 string hash
         var hash = 5381
         for scalar in seed.unicodeScalars {
             hash = ((hash << 5) &+ hash) &+ Int(scalar.value)
