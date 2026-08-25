@@ -1,9 +1,7 @@
 import SwiftUI
 
 extension Color {
-    /// Creates a Color from a 6-digit hex string (with or without a
-    /// leading "#"). Used exclusively by the design-system color tokens
-    /// so the rest of the app never touches hex literals directly.
+    
     init(hex: String) {
         let sanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
             .replacingOccurrences(of: "#", with: "")
