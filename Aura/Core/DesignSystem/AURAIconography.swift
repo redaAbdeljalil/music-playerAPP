@@ -1,7 +1,5 @@
 import Foundation
 
-/// Every SF Symbol name used in the app, centralized so the icon set
-/// stays intentional and swaps are a one-line change.
 enum AURAIcon {
     static let play = "play.fill"
     static let pause = "pause.fill"

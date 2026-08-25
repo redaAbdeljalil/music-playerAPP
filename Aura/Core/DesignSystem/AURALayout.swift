@@ -1,7 +1,4 @@
 import SwiftUI
-
-/// 4pt-based spacing scale. Everything in the app should reference these
-/// rather than raw numbers, so rhythm stays consistent across screens.
 enum AURASpacing {
     static let xxs: CGFloat = 4
     static let xs: CGFloat = 8
@@ -13,9 +10,7 @@ enum AURASpacing {
     static let xxxl: CGFloat = 64
 }
 
-/// Deliberately restrained corner radii — AURA avoids the "everything is
-/// a rounded blob" look. Sharp-ish corners on cards, a pill only where a
-/// pill is semantically correct (buttons, chips, circular artwork).
+/// Deliberately restrained corner radii
 enum AURARadius {
     static let sm: CGFloat = 4
     static let md: CGFloat = 10
@@ -23,8 +18,6 @@ enum AURARadius {
     static let pill: CGFloat = 999
 }
 
-/// A shadow token bundles color/radius/offset so shadows stay consistent
-/// instead of ad-hoc `.shadow()` calls scattered through the codebase.
 struct AURAShadowToken {
     let color: Color
     let radius: CGFloat
