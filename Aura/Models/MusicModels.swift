@@ -14,9 +14,7 @@ struct Album: Identifiable, Hashable {
     let artworkSeed: String
 }
 
-/// Backing genre taxonomy. Not every case is necessarily represented in
-/// the mock catalog — the enum exists so the data layer (and eventually
-/// a real API) has somewhere to grow into.
+
 enum Genre: String, CaseIterable, Hashable {
     case ambient, electronic, soul, jazz, indie, lofi, classical, experimental
 
@@ -32,9 +30,7 @@ struct Track: Identifiable, Hashable {
     let albumID: String
     let albumTitle: String
     let duration: TimeInterval
-    /// Seed for the procedurally generated artwork (see `ArtworkView`).
     let artworkSeed: String
-    /// Filename (without extension) of the bundled audio resource.
     let audioFileName: String
     let moodIDs: [String]
     let genre: Genre

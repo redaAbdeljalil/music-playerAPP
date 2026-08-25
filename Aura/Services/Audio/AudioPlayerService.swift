@@ -1,15 +1,9 @@
 import Foundation
 import AVFoundation
 
-/// Thin abstraction over the real audio engine so `PlaybackManager` never
-/// touches AVFoundation directly. Swapping local playback for a streaming
-/// implementation (AVPlayer against remote URLs) later means writing one
-/// new conformer — the queue/shuffle/repeat logic in `PlaybackManager`
-/// doesn't change at all.
+
 protocol AudioEngine: AnyObject {
-    /// Fired when the current item finishes playing on its own.
     var onFinish: (() -> Void)? { get set }
-    /// Fired roughly 4x/second with (currentTime, duration) while loaded.
     var onTimeUpdate: ((TimeInterval, TimeInterval) -> Void)? { get set }
 
     @discardableResult

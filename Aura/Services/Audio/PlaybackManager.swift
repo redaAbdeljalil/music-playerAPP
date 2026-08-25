@@ -13,11 +13,7 @@ enum RepeatMode {
     }
 }
 
-/// The single source of truth for "what's playing right now." Owns the
-/// queue, current index, shuffle order, and repeat mode, and delegates
-/// the actual decoding/output to an `AudioEngine`. Every screen that
-/// needs playback state (mini player, Now Playing, track rows showing
-/// an active indicator) reads this via `@EnvironmentObject`.
+
 @MainActor
 final class PlaybackManager: ObservableObject {
     @Published private(set) var currentTrack: Track?
@@ -30,8 +26,7 @@ final class PlaybackManager: ObservableObject {
     }
     @Published var repeatMode: RepeatMode = .off
 
-    /// Composition-root hook: RootView wires this to `UserLibraryStore.recordPlay`
-    /// so this type never needs to know that store exists.
+
     var onTrackDidStart: ((Track) -> Void)?
 
     private let engine: AudioEngine
