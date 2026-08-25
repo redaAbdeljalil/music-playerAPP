@@ -11,10 +11,7 @@ struct SearchResults {
     }
 }
 
-/// Everything a screen needs from the music catalog goes through this
-/// protocol. `MockMusicLibraryService` is the only conformer today; a
-/// future networked implementation is a drop-in replacement — nothing
-/// in Features/ needs to know the difference.
+
 protocol MusicLibraryProviding {
     func allTracks() -> [Track]
     func allArtists() -> [Artist]
@@ -50,7 +47,6 @@ final class MockMusicLibraryService: MusicLibraryProviding {
         guard let playlist = MockMusicData.playlists.first(where: { $0.id == playlistID }) else {
             return []
         }
-        // Preserve the playlist's own ordering rather than the catalog's.
         return playlist.trackIDs.compactMap { id in
             MockMusicData.tracks.first(where: { $0.id == id })
         }

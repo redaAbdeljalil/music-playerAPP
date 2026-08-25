@@ -1,13 +1,5 @@
 import Foundation
 
-/// A single, centralized source of mock content. Nothing in the Features
-/// layer should hardcode track/artist/mood data directly — everything
-/// flows through `MusicLibraryProviding`, which this file backs. Swapping
-/// this out for a real API later means writing one new type that conforms
-/// to `MusicLibraryProviding`; nothing else in the app needs to change.
-///
-/// All artist, track, album, and playlist names below are original and
-/// fictional — invented for this project, not drawn from any real catalog.
 enum MockMusicData {
 
     // MARK: - Artists
@@ -51,11 +43,6 @@ enum MockMusicData {
     ]
 
     // MARK: - Tracks
-    //
-    // `audioFileName` cycles through the six bundled placeholder ambient
-    // tones in Resources/SampleAudio (see README for details). `duration`
-    // matches each file's real length exactly so the UI never shows a
-    // mismatched scrubber.
 
     static let tracks: [Track] = [
         Track(id: "track_amber_hours", title: "Amber Hours", artistName: "Nadia Vale", albumID: "album_amber_hours", albumTitle: "Amber Hours", duration: 24, artworkSeed: "track_amber_hours", audioFileName: "aura_sample_1", moodIDs: ["mood_late_night", "mood_after_hours"], genre: .soul),

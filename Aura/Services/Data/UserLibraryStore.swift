@@ -1,12 +1,7 @@
 import Foundation
 import Combine
 
-/// Holds the user's own relationship to the catalog — likes, play
-/// history, saved albums. Deliberately separate from
-/// `MusicLibraryProviding` (which is the read-only catalog): this is
-/// mutable, per-user state, in-memory for the MVP but structured so it
-/// could be backed by persistence (UserDefaults/SwiftData) later without
-/// changing any call site.
+
 @MainActor
 final class UserLibraryStore: ObservableObject {
     @Published private(set) var likedTracks: [Track] = []
@@ -36,9 +31,6 @@ final class UserLibraryStore: ObservableObject {
         }
     }
 
-    /// Pre-populates a little content so Library isn't a dead end on
-    /// first launch. Safe to call more than once (e.g. from `onAppear`
-    /// firing again) — only takes effect the first time.
     func seedDefaults(likedTracks: [Track], savedAlbums: [Album]) {
         guard !didSeedDefaults else { return }
         didSeedDefaults = true
