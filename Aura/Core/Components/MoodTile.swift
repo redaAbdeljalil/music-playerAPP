@@ -6,7 +6,7 @@ struct MoodTile: View {
 
     var body: some View {
         ZStack(alignment: .bottomLeading) {
-            ArtworkView(seed: mood.artworkSeed, cornerRadius: AURARadius.lg)
+            ArtworkView(assetName: mood.imageAssetName, seed: mood.artworkSeed, cornerRadius: AURARadius.lg)
 
             LinearGradient(
                 colors: [.clear, Color.black.opacity(0.6)],

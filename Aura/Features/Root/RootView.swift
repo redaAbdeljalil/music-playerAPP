@@ -8,7 +8,7 @@ struct RootView: View {
     @State private var isNowPlayingExpanded = false
     @Namespace private var playerNamespace
 
-    private let library: MusicLibraryProviding = MockMusicLibraryService()
+    private let library: MusicLibraryProviding = CatalogMusicLibraryService()
 
     var body: some View {
         ZStack {
@@ -64,9 +64,17 @@ struct RootView: View {
         playback.onTrackDidStart = { track in
             libraryStore.recordPlay(track)
         }
+        // One track per artist, and each artist's debut album, so the app opens with a library
+        // that already spans the whole catalog instead of an arbitrary prefix of it.
+        let defaultLikedTracks = library.allArtists().compactMap { artist in
+            library.tracks(forArtist: artist.id).first
+        }
+        let defaultSavedAlbums = library.allArtists().compactMap { artist in
+            library.albums(forArtist: artist.id).first
+        }
         libraryStore.seedDefaults(
-            likedTracks: Array(library.allTracks().prefix(3)),
-            savedAlbums: Array(library.allAlbums().prefix(2))
+            likedTracks: defaultLikedTracks,
+            savedAlbums: Array(defaultSavedAlbums.prefix(3))
         )
     }
 }

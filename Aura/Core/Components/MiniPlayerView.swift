@@ -8,7 +8,7 @@ struct MiniPlayerView: View {
     var body: some View {
         if let track = playback.currentTrack {
             HStack(spacing: AURASpacing.sm) {
-                ArtworkView(seed: track.artworkSeed, cornerRadius: AURARadius.sm)
+                ArtworkView(assetName: track.artworkAssetName, seed: track.albumID, cornerRadius: AURARadius.sm)
                     .frame(width: 40, height: 40)
                     .matchedGeometryEffect(id: "playerArtwork", in: namespace)
 

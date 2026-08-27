@@ -6,32 +6,47 @@ struct HomeView: View {
     @EnvironmentObject private var libraryStore: UserLibraryStore
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: AURASpacing.xl) {
-                header
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: AURASpacing.xl) {
+                    header
 
-                if let current = playback.currentTrack {
-                    continueListening(current)
+                    if let current = playback.currentTrack {
+                        continueListening(current)
+                    }
+
+                    if let featured = viewModel.featured {
+                        spotlightSection(featured)
+                    }
+
+                    if !viewModel.rotation.isEmpty {
+                        rotationSection
+                    }
+
+                    artistsSection
+
+                    if !viewModel.exploreAlbums.isEmpty {
+                        albumsSection
+                    }
+
+                    moodSection
+
+                    if !libraryStore.recentlyPlayed.isEmpty {
+                        recentlyPlayedSection
+                    }
                 }
-
-                if let featured = viewModel.featured {
-                    featuredSection(featured)
-                }
-
-                curatedSection
-
-                moodSection
-
-                if !libraryStore.recentlyPlayed.isEmpty {
-                    recentlyPlayedSection
-                }
-
-                artistsSection
+                .padding(.top, AURASpacing.sm)
+                .padding(.bottom, AURASpacing.xxxl)
             }
-            .padding(.top, AURASpacing.sm)
-            .padding(.bottom, AURASpacing.xxxl)
+            .background(AURAColor.ink.ignoresSafeArea())
+            .navigationDestination(for: Artist.self) { artist in
+                ArtistDetailView(artist: artist)
+            }
+            .navigationDestination(for: Album.self) { album in
+                AlbumDetailView(album: album)
+            }
+            .toolbar(.hidden, for: .navigationBar)
         }
-        .background(AURAColor.ink.ignoresSafeArea())
     }
 
     // MARK: - Sections
@@ -55,7 +70,7 @@ struct HomeView: View {
             HapticsManager.tap()
         } label: {
             HStack(spacing: AURASpacing.sm) {
-                ArtworkView(seed: current.artworkSeed, cornerRadius: AURARadius.sm)
+                ArtworkView(assetName: current.artworkAssetName, seed: current.albumID, cornerRadius: AURARadius.sm)
                     .frame(width: 56, height: 56)
 
                 VStack(alignment: .leading, spacing: 2) {
@@ -85,46 +100,110 @@ struct HomeView: View {
         .accessibilityLabel("Continue listening: \(current.title) by \(current.artistName)")
     }
 
-    private func featuredSection(_ track: Track) -> some View {
-        VStack(alignment: .leading, spacing: AURASpacing.sm) {
-            Text("TODAY'S FEATURE")
+    /// The editorial replacement for a generic "featured card": artwork sits inset beside an
+    /// oversized artist name rather than behind a full-bleed gradient, so the type — not a stock
+    /// card shape — carries the moment.
+    private func spotlightSection(_ track: Track) -> some View {
+        VStack(alignment: .leading, spacing: AURASpacing.md) {
+            Text("TODAY'S SPOTLIGHT")
                 .font(AURAType.label)
                 .foregroundStyle(AURAColor.ash)
                 .padding(.horizontal, AURASpacing.md)
 
-            Button {
-                playback.play(track: track, in: [track] + viewModel.curated)
-            } label: {
-                ZStack(alignment: .bottomLeading) {
-                    ArtworkView(seed: track.artworkSeed, cornerRadius: AURARadius.lg)
-                    LinearGradient(colors: [.clear, .black.opacity(0.65)], startPoint: .center, endPoint: .bottom)
-                        .clipShape(RoundedRectangle(cornerRadius: AURARadius.lg, style: .continuous))
-
-                    VStack(alignment: .leading, spacing: AURASpacing.xxs) {
-                        Text(track.title)
-                            .font(AURAType.display)
-                            .foregroundStyle(.white)
-                        Text(track.artistName)
-                            .font(AURAType.body)
-                            .foregroundStyle(.white.opacity(0.8))
-                    }
-                    .padding(AURASpacing.md)
+            HStack(alignment: .top, spacing: AURASpacing.md) {
+                Button {
+                    playback.play(track: track, in: [track] + viewModel.rotation)
+                } label: {
+                    ArtworkView(
+                        assetName: track.artworkAssetName,
+                        seed: track.albumID,
+                        tintHex: viewModel.accentHex(forArtistID: track.artistID),
+                        cornerRadius: AURARadius.lg
+                    )
+                    .frame(width: 128, height: 128)
+                    .auraShadow(AURAShadow.soft)
                 }
-                .frame(height: 320)
+                .buttonStyle(.plain)
+                .accessibilityLabel("Play \(track.title) by \(track.artistName)")
+
+                VStack(alignment: .leading, spacing: AURASpacing.xxs) {
+                    Text(track.artistName)
+                        .font(AURAType.colossal)
+                        .foregroundStyle(AURAColor.bone)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.55)
+                    Text(track.title)
+                        .font(AURAType.body)
+                        .foregroundStyle(AURAColor.ash)
+                        .lineLimit(1)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, AURASpacing.xxs)
             }
-            .buttonStyle(.plain)
             .padding(.horizontal, AURASpacing.md)
-            .accessibilityLabel("Today's feature: \(track.title) by \(track.artistName). Double tap to play.")
+
+            Button {
+                playback.play(track: track, in: [track] + viewModel.rotation)
+            } label: {
+                Label("Play", systemImage: AURAIcon.play)
+            }
+            .buttonStyle(.auraPrimary)
+            .padding(.horizontal, AURASpacing.md)
         }
     }
 
-    private var curatedSection: some View {
+    private var rotationSection: some View {
         VStack(alignment: .leading, spacing: AURASpacing.sm) {
-            SectionHeader(title: "Curated for you")
+            SectionHeader(title: "This week's rotation")
                 .padding(.horizontal, AURASpacing.md)
-            TrackShelf(tracks: viewModel.curated) { track in
-                playback.play(track: track, in: viewModel.curated)
+            LazyVStack(spacing: AURASpacing.xs) {
+                ForEach(Array(viewModel.rotation.enumerated()), id: \.element.id) { index, track in
+                    TrackRow(track: track, isActive: playback.isCurrentTrack(track), rank: index + 1) {
+                        playback.play(track: track, in: viewModel.rotation)
+                    }
+                }
             }
+            .padding(.horizontal, AURASpacing.md)
+        }
+    }
+
+    private var artistsSection: some View {
+        VStack(alignment: .leading, spacing: AURASpacing.sm) {
+            SectionHeader(title: "Artists")
+                .padding(.horizontal, AURASpacing.md)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: AURASpacing.lg) {
+                    ForEach(viewModel.recommendedArtists) { artist in
+                        NavigationLink(value: artist) {
+                            VStack(spacing: AURASpacing.xxs) {
+                                ArtworkView(
+                                    assetName: artist.imageAssetName,
+                                    seed: artist.id,
+                                    tintHex: artist.accentColorHex,
+                                    cornerRadius: AURARadius.lg
+                                )
+                                .frame(width: 96, height: 96)
+                                Text(artist.name)
+                                    .font(AURAType.caption)
+                                    .foregroundStyle(AURAColor.bone)
+                                    .lineLimit(1)
+                                    .frame(width: 96)
+                            }
+                            .accessibilityElement(children: .combine)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, AURASpacing.md)
+            }
+        }
+    }
+
+    private var albumsSection: some View {
+        VStack(alignment: .leading, spacing: AURASpacing.sm) {
+            SectionHeader(title: "Albums to explore")
+                .padding(.horizontal, AURASpacing.md)
+            AlbumShelf(albums: viewModel.exploreAlbums)
         }
     }
 
@@ -150,31 +229,6 @@ struct HomeView: View {
                 .padding(.horizontal, AURASpacing.md)
             TrackShelf(tracks: libraryStore.recentlyPlayed) { track in
                 playback.play(track: track, in: libraryStore.recentlyPlayed)
-            }
-        }
-    }
-
-    private var artistsSection: some View {
-        VStack(alignment: .leading, spacing: AURASpacing.sm) {
-            SectionHeader(title: "Recommended artists")
-                .padding(.horizontal, AURASpacing.md)
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: AURASpacing.lg) {
-                    ForEach(viewModel.recommendedArtists) { artist in
-                        VStack(spacing: AURASpacing.xxs) {
-                            ArtworkView(seed: artist.id, cornerRadius: AURARadius.pill)
-                                .frame(width: 84, height: 84)
-                                .clipShape(Circle())
-                            Text(artist.name)
-                                .font(AURAType.caption)
-                                .foregroundStyle(AURAColor.bone)
-                                .lineLimit(1)
-                                .frame(width: 84)
-                        }
-                        .accessibilityElement(children: .combine)
-                    }
-                }
-                .padding(.horizontal, AURASpacing.md)
             }
         }
     }

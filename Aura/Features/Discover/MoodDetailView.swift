@@ -10,7 +10,7 @@ struct MoodDetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: AURASpacing.md) {
                 ZStack(alignment: .bottomLeading) {
-                    ArtworkView(seed: mood.artworkSeed, cornerRadius: 0)
+                    ArtworkView(assetName: mood.imageAssetName, seed: mood.artworkSeed, cornerRadius: 0)
                         .frame(height: 220)
                         .clipped()
                     LinearGradient(colors: [.clear, AURAColor.ink], startPoint: .center, endPoint: .bottom)
@@ -38,8 +38,8 @@ struct MoodDetailView: View {
                 .disabled(tracks.isEmpty)
 
                 LazyVStack(spacing: AURASpacing.xs) {
-                    ForEach(tracks) { track in
-                        TrackRow(track: track, isActive: playback.isCurrentTrack(track)) {
+                    ForEach(Array(tracks.enumerated()), id: \.element.id) { index, track in
+                        TrackRow(track: track, isActive: playback.isCurrentTrack(track), rank: index + 1) {
                             playback.play(track: track, in: tracks)
                         }
                     }

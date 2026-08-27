@@ -11,15 +11,17 @@ struct NowPlayingView: View {
     @State private var dragOffset: CGFloat = 0
     @State private var breathe = false
 
+    private let library: MusicLibraryProviding = CatalogMusicLibraryService()
+
     var body: some View {
         if let track = playback.currentTrack {
             ZStack {
-                ambientBackground(seed: track.artworkSeed)
+                ambientBackground(for: track)
 
                 VStack(spacing: 0) {
                     header
                     Spacer(minLength: AURASpacing.lg)
-                    artwork(seed: track.artworkSeed)
+                    artwork(for: track)
                     Spacer(minLength: AURASpacing.xl)
                     trackInfo(track: track)
                     scrubber
@@ -99,24 +101,34 @@ struct NowPlayingView: View {
         }
     }
 
-    private func ambientBackground(seed: String) -> some View {
-        ArtworkView(seed: seed, cornerRadius: 0)
-            .scaleEffect(1.6)
-            .blur(radius: 70)
-            .opacity(0.55)
-            .rotationEffect(.degrees(breathe ? 6 : -6))
-            .animation(.easeInOut(duration: 14).repeatForever(autoreverses: true), value: breathe)
-            .ignoresSafeArea()
-            .overlay(AURAColor.ink.opacity(0.35).ignoresSafeArea())
+    private func ambientBackground(for track: Track) -> some View {
+        ArtworkView(
+            assetName: track.artworkAssetName,
+            seed: track.albumID,
+            tintHex: library.artist(byID: track.artistID)?.accentColorHex,
+            cornerRadius: 0
+        )
+        .scaleEffect(1.6)
+        .blur(radius: 70)
+        .opacity(0.55)
+        .rotationEffect(.degrees(breathe ? 6 : -6))
+        .animation(.easeInOut(duration: 14).repeatForever(autoreverses: true), value: breathe)
+        .ignoresSafeArea()
+        .overlay(AURAColor.ink.opacity(0.35).ignoresSafeArea())
     }
 
-    private func artwork(seed: String) -> some View {
-        ArtworkView(seed: seed, cornerRadius: AURARadius.lg)
-            .matchedGeometryEffect(id: "playerArtwork", in: namespace)
-            .frame(width: 300, height: 300)
-            .scaleEffect(breathe && playback.isPlaying ? 1.02 : 1.0)
-            .animation(.easeInOut(duration: 3.5).repeatForever(autoreverses: true), value: breathe)
-            .auraShadow(AURAShadow.elevated)
+    private func artwork(for track: Track) -> some View {
+        ArtworkView(
+            assetName: track.artworkAssetName,
+            seed: track.albumID,
+            tintHex: library.artist(byID: track.artistID)?.accentColorHex,
+            cornerRadius: AURARadius.lg
+        )
+        .matchedGeometryEffect(id: "playerArtwork", in: namespace)
+        .frame(width: 300, height: 300)
+        .scaleEffect(breathe && playback.isPlaying ? 1.02 : 1.0)
+        .animation(.easeInOut(duration: 3.5).repeatForever(autoreverses: true), value: breathe)
+        .auraShadow(AURAShadow.elevated)
     }
 
     private func trackInfo(track: Track) -> some View {

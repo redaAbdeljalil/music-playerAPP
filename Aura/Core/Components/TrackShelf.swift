@@ -12,7 +12,7 @@ struct TrackShelf: View {
                         onSelect(track)
                     } label: {
                         VStack(alignment: .leading, spacing: AURASpacing.xxs) {
-                            ArtworkView(seed: track.artworkSeed)
+                            ArtworkView(assetName: track.artworkAssetName, seed: track.albumID)
                                 .frame(width: 140, height: 140)
                             Text(track.title)
                                 .font(AURAType.caption)

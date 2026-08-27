@@ -1,6 +1,9 @@
 import SwiftUI
 
 enum AURAType {
+    /// Artist header names — the single biggest editorial moment in the app.
+    static let colossal = Font.system(size: 44, weight: .bold, design: .serif)
+
     /// Greetings, the Discover headline — the largest editorial moment.
     static let hero = Font.system(size: 34, weight: .semibold, design: .serif)
 
@@ -20,4 +23,7 @@ enum AURAType {
 
     /// Uppercase kickers and micro-labels ("CONTINUE LISTENING", tab labels).
     static let label = Font.system(size: 11, weight: .semibold, design: .default)
+
+    /// Editorial rank numerals — Popular tracks, album track lists.
+    static let numeral = Font.system(size: 19, weight: .light, design: .serif)
 }

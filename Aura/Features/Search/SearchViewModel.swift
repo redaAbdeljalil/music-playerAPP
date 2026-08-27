@@ -11,7 +11,7 @@ final class SearchViewModel: ObservableObject {
     private let library: MusicLibraryProviding
     private let maxRecents = 6
 
-    init(library: MusicLibraryProviding = MockMusicLibraryService()) {
+    init(library: MusicLibraryProviding = CatalogMusicLibraryService()) {
         self.library = library
         let moodNames = library.allMoods().prefix(3).map { $0.name }
         let artistNames = library.allArtists().prefix(2).map { $0.name }

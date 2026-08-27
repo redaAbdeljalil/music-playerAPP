@@ -6,30 +6,39 @@ struct SearchView: View {
     @FocusState private var isFieldFocused: Bool
 
     var body: some View {
-        VStack(spacing: 0) {
-            searchField
+        NavigationStack {
+            VStack(spacing: 0) {
+                searchField
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: AURASpacing.lg) {
-                    if viewModel.query.trimmingCharacters(in: .whitespaces).isEmpty {
-                        suggestionsContent
-                    } else if viewModel.results.isEmpty {
-                        EmptyStateView(
-                            icon: AURAIcon.noResults,
-                            title: "No results",
-                            message: "No matches for \u{201C}\(viewModel.query)\u{201D}. Try a different mood, artist, or title."
-                        )
-                        .padding(.top, AURASpacing.xxl)
-                    } else {
-                        resultsContent
+                ScrollView {
+                    VStack(alignment: .leading, spacing: AURASpacing.lg) {
+                        if viewModel.query.trimmingCharacters(in: .whitespaces).isEmpty {
+                            suggestionsContent
+                        } else if viewModel.results.isEmpty {
+                            EmptyStateView(
+                                icon: AURAIcon.noResults,
+                                title: "No results",
+                                message: "No matches for \u{201C}\(viewModel.query)\u{201D}. Try a different mood, artist, or title."
+                            )
+                            .padding(.top, AURASpacing.xxl)
+                        } else {
+                            resultsContent
+                        }
                     }
+                    .padding(.horizontal, AURASpacing.md)
+                    .padding(.top, AURASpacing.md)
+                    .padding(.bottom, AURASpacing.xxxl)
                 }
-                .padding(.horizontal, AURASpacing.md)
-                .padding(.top, AURASpacing.md)
-                .padding(.bottom, AURASpacing.xxxl)
             }
+            .background(AURAColor.ink.ignoresSafeArea())
+            .navigationDestination(for: Artist.self) { artist in
+                ArtistDetailView(artist: artist)
+            }
+            .navigationDestination(for: Album.self) { album in
+                AlbumDetailView(album: album)
+            }
+            .toolbar(.hidden, for: .navigationBar)
         }
-        .background(AURAColor.ink.ignoresSafeArea())
     }
 
     // MARK: - Search field
@@ -132,14 +141,22 @@ struct SearchView: View {
                 VStack(alignment: .leading, spacing: AURASpacing.sm) {
                     SectionHeader(title: "Artists")
                     ForEach(viewModel.results.artists) { artist in
-                        HStack(spacing: AURASpacing.sm) {
-                            ArtworkView(seed: artist.id, cornerRadius: AURARadius.pill)
+                        NavigationLink(value: artist) {
+                            HStack(spacing: AURASpacing.sm) {
+                                ArtworkView(
+                                    assetName: artist.imageAssetName,
+                                    seed: artist.id,
+                                    tintHex: artist.accentColorHex,
+                                    cornerRadius: AURARadius.md
+                                )
                                 .frame(width: 40, height: 40)
-                                .clipShape(Circle())
-                            Text(artist.name)
-                                .foregroundStyle(AURAColor.bone)
-                            Spacer()
+                                Text(artist.name)
+                                    .foregroundStyle(AURAColor.bone)
+                                Spacer()
+                            }
+                            .contentShape(Rectangle())
                         }
+                        .buttonStyle(.plain)
                     }
                 }
             }
@@ -148,15 +165,19 @@ struct SearchView: View {
                 VStack(alignment: .leading, spacing: AURASpacing.sm) {
                     SectionHeader(title: "Albums")
                     ForEach(viewModel.results.albums) { album in
-                        HStack(spacing: AURASpacing.sm) {
-                            ArtworkView(seed: album.artworkSeed, cornerRadius: AURARadius.sm)
-                                .frame(width: 40, height: 40)
-                            VStack(alignment: .leading, spacing: 1) {
-                                Text(album.title).foregroundStyle(AURAColor.bone)
-                                Text(album.artistName).font(AURAType.caption).foregroundStyle(AURAColor.ash)
+                        NavigationLink(value: album) {
+                            HStack(spacing: AURASpacing.sm) {
+                                ArtworkView(assetName: album.artworkAssetName, seed: album.id, cornerRadius: AURARadius.sm)
+                                    .frame(width: 40, height: 40)
+                                VStack(alignment: .leading, spacing: 1) {
+                                    Text(album.title).foregroundStyle(AURAColor.bone)
+                                    Text(album.artistName).font(AURAType.caption).foregroundStyle(AURAColor.ash)
+                                }
+                                Spacer()
                             }
-                            Spacer()
+                            .contentShape(Rectangle())
                         }
+                        .buttonStyle(.plain)
                     }
                 }
             }
@@ -166,7 +187,7 @@ struct SearchView: View {
                     SectionHeader(title: "Playlists")
                     ForEach(viewModel.results.playlists) { playlist in
                         HStack(spacing: AURASpacing.sm) {
-                            ArtworkView(seed: playlist.artworkSeed, cornerRadius: AURARadius.sm)
+                            ArtworkView(assetName: playlist.imageAssetName, seed: playlist.artworkSeed, cornerRadius: AURARadius.sm)
                                 .frame(width: 40, height: 40)
                             VStack(alignment: .leading, spacing: 1) {
                                 Text(playlist.title).foregroundStyle(AURAColor.bone)

@@ -23,6 +23,14 @@ struct DiscoverView: View {
                     .padding(.horizontal, AURASpacing.md)
                     .padding(.top, AURASpacing.sm)
 
+                    if let featuredMood = viewModel.featuredMood {
+                        NavigationLink(value: featuredMood) {
+                            MoodTile(mood: featuredMood, height: 220)
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.horizontal, AURASpacing.md)
+                    }
+
                     LazyVGrid(columns: columns, spacing: AURASpacing.md) {
                         ForEach(Array(viewModel.moods.enumerated()), id: \.element.id) { index, mood in
                             NavigationLink(value: mood) {
