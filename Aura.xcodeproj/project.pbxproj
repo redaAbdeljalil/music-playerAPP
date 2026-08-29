@@ -14,9 +14,9 @@
 		619500A82B9B86AA890F81CC /* Exceptions for "Aura" folder in "Aura" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Resources/Albums/README.md,
 				Resources/Artists/README.md,
 				Resources/Audio/README.md,
-				Resources/Albums/README.md,
 			);
 			target = 155DA811303E2174002ACB8C /* Aura */;
 		};
